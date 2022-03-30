@@ -25,27 +25,6 @@ const PORT = process.env.PORT || 3002;
 //   console.log(request.query);
 //   console.log(url);
 
-//   try {
-//     let data = await axios.get(url);
-//     let weatherObj = data.data.map(day =>{
-//       return new Forecast(day);
-//     });
-//     console.log(data);
-//     console.log(weatherObj);
-//     response.send(weatherObj);
-//   } catch (error) {
-//     response.send(error.message);
-//   }
-// });
-
-// class Forecast {
-//   constructor(date) {
-//     this.date = date.dateTime;
-//     this.description = date.weather.description;
-//   }
-// }
-
-
 
 class Forecast {
   constructor(weatherData) {
@@ -92,6 +71,8 @@ class Movie {
   }
 }
 
+app.listen(PORT, () => console.log(`Listening on port:${PORT}`));
+
 // getting data from the end route and seding a response back to the user using .get
 // the "/" means its the home route
 // every call back function in our app.get has to have request and a response
@@ -115,4 +96,4 @@ class Movie {
 
 // .listen tells the express app which port to listen on
 // the second arguement checks to see if the port we're runing on is 3001
-app.listen(PORT, () => console.log(`Listening on port:${PORT}`));
+
