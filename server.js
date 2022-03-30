@@ -19,15 +19,63 @@ const axios = require('axios');
 app.use(cors());
 const PORT = process.env.PORT || 3002;
 
+// app.get('/weather', async (request, response) => {
+//   const {lat, lon} = request.query;
+//   const url = `https://api.weatherbit.io/v2.0/forecast/daily/?key=${process.env.WEATHER_API_KEY}&land=en&lat=${lat}&lon=${lon}&days=5`;
+//   console.log(request.query);
+//   console.log(url);
 
+//   try {
+//     let data = await axios.get(url);
+//     let weatherObj = data.data.map(day =>{
+//       return new Forecast(day);
+//     });
+//     console.log(data);
+//     console.log(weatherObj);
+//     response.send(weatherObj);
+//   } catch (error) {
+//     response.send(error.message);
+//   }
+// });
+
+// class Forecast {
+//   constructor(date) {
+//     this.date = date.dateTime;
+//     this.description = date.weather.description;
+//   }
+// }
+
+
+
+class Forecast {
+  constructor(weatherData) {
+    this.date = weatherData.datetime;
+    this.description = weatherData.weather.description;
+  }
+}
+app.get('/weather', async (request, response) => {
+  const lat = request.query.lat;
+  const lon = request.query.lon;
+  const url = `https://api.weatherbit.io/v2.0/forecast/daily/?&lat=${lat}&lon=${lon}&days=7&key=${process.env.WEATHER_API_KEY}`;
+
+  try {
+    let weather = await axios.get(url);
+    weather = weather.data.data;
+    const weatherArray = weather.map(value => new Forecast(value));
+    response.send(weatherArray);
+  } catch (error) {
+    response.send(error.message);
+  }
+});
 
 app.get('/movies', async (request, response) => {
   const movieQuery = request.query.query;
-  const url = `https://api.themoviedb.org/3/movie/550?api_key=${process.env.MOVIE_API_KEY}&language=en-US&query=${movieQuery}`;
-
+  const url = `https://api.themoviedb.org/3/search/movie/?api_key=${process.env.MOVIE_API_KEY}&langeuage=en-US&page=1&query=${movieQuery}`;
+ 
   try {
     let movies = await axios.get(url);
-    response.send(movies.data);
+    const moviesArray = movies.data.results.map(movie => new Movie(movie));
+    response.send(moviesArray);
   } catch (error) {
     response.send(error.message);
   }
@@ -39,7 +87,7 @@ class Movie {
     this.overview = movies.overview;
     this.img_url = movies.backdrop_path;
     this.rating = movies.vote_average;
-    this.releaseDate = movies.release_Date;
+    this.releaseDate = movies.release_date;
 
   }
 }
