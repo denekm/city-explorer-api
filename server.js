@@ -8,9 +8,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const axios = require('axios');
-// const weatherData = require('./data/weather.json');
-
+const weatherCallBack = require('./weather.js');
+const movieCallBack = require('./movies.js');
 
 
 
@@ -19,57 +18,8 @@ const axios = require('axios');
 app.use(cors());
 const PORT = process.env.PORT || 3002;
 
-// app.get('/weather', async (request, response) => {
-//   const {lat, lon} = request.query;
-//   const url = `https://api.weatherbit.io/v2.0/forecast/daily/?key=${process.env.WEATHER_API_KEY}&land=en&lat=${lat}&lon=${lon}&days=5`;
-//   console.log(request.query);
-//   console.log(url);
-
-
-class Forecast {
-  constructor(weatherData) {
-    this.date = weatherData.datetime;
-    this.description = weatherData.weather.description;
-  }
-}
-app.get('/weather', async (request, response) => {
-  const lat = request.query.lat;
-  const lon = request.query.lon;
-  const url = `https://api.weatherbit.io/v2.0/forecast/daily/?&lat=${lat}&lon=${lon}&days=7&key=${process.env.WEATHER_API_KEY}`;
-
-  try {
-    let weather = await axios.get(url);
-    weather = weather.data.data;
-    const weatherArray = weather.map(value => new Forecast(value));
-    response.send(weatherArray);
-  } catch (error) {
-    response.send(error.message);
-  }
-});
-
-app.get('/movies', async (request, response) => {
-  const movieQuery = request.query.query;
-  const url = `https://api.themoviedb.org/3/search/movie/?api_key=${process.env.MOVIE_API_KEY}&langeuage=en-US&page=1&query=${movieQuery}`;
- 
-  try {
-    let movies = await axios.get(url);
-    const moviesArray = movies.data.results.map(movie => new Movie(movie));
-    response.send(moviesArray);
-  } catch (error) {
-    response.send(error.message);
-  }
-});
-
-class Movie {
-  constructor(movies) {
-    this.title = movies.original_title;
-    this.overview = movies.overview;
-    this.img_url = movies.backdrop_path;
-    this.rating = movies.vote_average;
-    this.releaseDate = movies.release_date;
-
-  }
-}
+app.get('/weather',weatherCallBack);
+app.get('/movies', movieCallBack);
 
 app.listen(PORT, () => console.log(`Listening on port:${PORT}`));
 
