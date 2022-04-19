@@ -10,6 +10,7 @@ const cors = require('cors');
 const app = express();
 const weatherCallBack = require('./weather.js');
 const movieCallBack = require('./movies.js');
+const weather = require('./weather.js');
 
 
 
@@ -18,8 +19,20 @@ const movieCallBack = require('./movies.js');
 app.use(cors());
 const PORT = process.env.PORT || 3002;
 
-app.get('/weather',weatherCallBack);
+app.get('/weather', weatherCallBack);
 app.get('/movies', movieCallBack);
+app.get('/weather', weatherHandler);
+
+async function weatherHandler(request, response) {
+  let lat = request.qury.lat;
+  let lon = request.qury.lon;
+  await weather(lat, lon)
+    .then(summaries => response.send(summaries))
+    .catch((error) => {
+      console.error(error);
+      response.status(200).send('Sorry. Something went wrong!')
+    });
+}
 
 app.listen(PORT, () => console.log(`Listening on port:${PORT}`));
 
